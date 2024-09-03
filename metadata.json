@@ -1,0 +1,37 @@
+{
+    "header": {
+        "protocol_identifier": 22,
+        "send_time": 1354655676,
+        "message_length": 45646,
+        "message_serial_number": 1,
+        "check_bit": 4,
+        "type": 3
+    },
+    "serverName": "register",
+    "address": "192.168.1.10",
+    "port": 50051,
+    "services_list": [
+        {
+            "metadata": {
+                "version": "v1.0.0",
+                "decription":"asdasfadf",
+                "developer":"zhangsan",
+                "build_time":4356456432
+            },                                                  
+            "service_name": "UserService",
+            "card": "huawei",
+            "os": "openEuler"
+        },
+        {
+            "metadata": {
+                "version": "v1.1.0",
+                "decription":"asdasfadf",
+                "developer":"zhangsan",
+                "build_time":4356456432
+            },
+            "service_name": "OrderService",
+            "card": "rk3588",
+            "os": "huawei"
+        }
+    ]
+}

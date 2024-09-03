@@ -1,0 +1,78 @@
+{
+    "services": [
+        {
+            "service_name": "UserService",
+            "metadata": {
+                "version": "v1.0.0",
+                "decription":"asdasfadf",
+                "developer":"zhangsan",
+                "build_time":4356456432
+            },
+            "instances": [
+                {
+                    "instance_id": "user-service-1",
+                    "server_name":"register",
+                    "address": "192.168.1.10",
+                    "port": 50051,
+                    "metadata": {
+                        "card": "huawei",
+                        "os": "openEuler",
+                        "create_time":5564643541231,
+                        "ram_usage": 20,
+                        "cpu_usage": 40,
+                        "network_usage": 40
+                    },
+                    "heartbeat_time": 5564643541231,
+                    "status": "UP",
+                    "role": 1
+                },
+                {
+                    "instance_id": "user-service-2",
+                    "server_name":"register",
+                    "address": "192.168.1.11",
+                    "port": 50051,
+                    "metadata": {
+                        "card": "rk3588",
+                        "os": "yihui",
+                        "create_time":5564643541231,
+                        "ram_usage": 20,
+                        "cpu_usage": 40,
+                        "network_usage": 40
+                    },
+                    "heartbeat_time": 5564643541231,
+                    "status": "UP",
+                    "role": 1
+                }
+            ]
+        },
+        {
+            "service_name": "OrderService",
+            "metadata": {
+                "version": "v1.0.0",
+                "decription":"asdasfadf",
+                "developer":"zhangsan",
+                "build_time":5564643541231
+            },
+            "instances": [
+                {
+                    "instance_id": "order-service-1",
+                    "server_name":"register",
+                    "address": "192.168.1.12",
+                    "port": 50051,
+                    "metadata": {
+                        "version": "v1.1.0",
+                        "card": "rk3588",
+                        "os": "huawei",
+                        "create_time":5564643541231,
+                        "ram_usage": 20,
+                        "cpu_usage": 40,
+                        "network_usage": 40
+                    },
+                    "heartbeat_time": 5564643541231,
+                    "status": "UP",
+                    "role": 2
+                }
+            ]
+        }
+    ]
+}

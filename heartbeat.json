@@ -1,0 +1,22 @@
+{
+    "header": {
+        "protocol_identifier": 22,
+        "send_time": 1354655676,
+        "message_length": 45646,
+        "message_serial_number": 1,
+        "check_bit": 4,
+        "type": 7
+    },
+    "server_name": "register",
+	"address": "192.168.1.10",
+	"port": 50051,
+	"services_list": [{
+			"service_name": "UserService",
+			"role": 1
+		},
+		{
+			"service_name": "OrderService",
+			"role": 2
+		}
+	]
+}

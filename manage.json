@@ -1,0 +1,12 @@
+{
+    "header": {
+        "protocol_identifier": 22,
+        "send_time": 1354655676,
+        "message_length": 45646,
+        "message_serial_number": 1,
+        "check_bit": 4,
+        "type": 8
+    },
+    "request_name": "getAllServices",
+    "data": {}
+}

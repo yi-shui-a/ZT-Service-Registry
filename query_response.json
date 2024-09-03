@@ -1,0 +1,25 @@
+{
+    "header": {
+        "protocol_identifier": 22,
+        "send_time": 1354655676,
+        "message_length": 45646,
+        "message_serial_number": 1,
+        "check_bit": 4,
+        "type": 6
+    },
+    "service_num": "2",
+    "instance_list": [
+        {
+            "address": "127.0.0.1",
+            "port": 6666,
+            "serverName": "XXX",
+            "role": 1
+        },
+        {
+            "address": "127.0.0.1",
+            "port": 6666,
+            "serverName": "XXX",
+            "role": 1
+        }
+    ]
+}

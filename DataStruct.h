@@ -20,6 +20,7 @@ struct config_json_struct
     u_int16_t SERVER_PORT;
     u_int16_t MANAGE_PORT;
     char DATABASE_NAME[50];
+    char LOCKFILE[50];
 };
 
 struct connect_struct

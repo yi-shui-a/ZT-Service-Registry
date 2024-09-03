@@ -114,6 +114,12 @@ struct config_json_struct config_load(char *filepath)
     {
         strcpy(result_struct.DATABASE_NAME, DATABASE_NAME->valuestring);
     }
+    cJSON *LOCKFILE = cJSON_GetObjectItemCaseSensitive(json, "LOCKFILE");
+
+    if (cJSON_IsString(LOCKFILE) && (LOCKFILE->valuestring != NULL))
+    {
+        strcpy(result_struct.LOCKFILE, LOCKFILE->valuestring);
+    }
 
     // 清理
     cJSON_Delete(json);

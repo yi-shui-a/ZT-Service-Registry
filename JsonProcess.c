@@ -93,7 +93,11 @@ struct config_json_struct config_load(char *filepath)
 
     if (cJSON_IsString(ADDRESS) && (ADDRESS->valuestring != NULL))
     {
+
         strcpy(result_struct.ADDRESS, ADDRESS->valuestring);
+        // printf("%s", result_struct.ADDRESS);
+        // printf("%d",strlen(ADDRESS->valuestring));
+        // strcat(result_struct.ADDRESS, '\0');
     }
 
     cJSON *SERVER_PORT = cJSON_GetObjectItemCaseSensitive(json, "SERVER_PORT");
@@ -181,7 +185,7 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
                     // 通过服务器名、地址、端口判断是否是同一个实例
                     // 如果存在该实例，修改状态、心跳、主备
                     // 如果存在该实例，更新所有状态
-                    if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "server_name")->valuestring, server_name->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring, address->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "port"), port->valueint) == 0)
+                    if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "server_name")->valuestring, server_name->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring, address->valuestring) == 0 && cJSON_GetObjectItemCaseSensitive(temp_instance, "port")->valueint == port->valueint)
                     {
                         cJSON_SetValuestring(cJSON_GetObjectItemCaseSensitive(temp_instance, "status"), "UP");
                         cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(temp_instance, "heartbeat_time"), send_time->valueint);
@@ -316,7 +320,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                     // 通过服务器名、地址、端口判断是否是同一个实例
                     // 如果存在该实例，先修改状态、心跳、主备，在检查是否存在元数据
                     // 如果存在该实例，更新所有状态
-                    if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "server_name")->valuestring, server_name->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring, address->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "port"), port->valueint) == 0)
+                    if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "server_name")->valuestring, server_name->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring, address->valuestring) == 0 && cJSON_GetObjectItemCaseSensitive(temp_instance, "port")->valueint == port->valueint)
                     {
                         // cJSON_SetValuestring(cJSON_GetObjectItemCaseSensitive(temp_instance, "status"), "UP");
                         cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(temp_instance, "heartbeat_time"), send_time->valueint);
@@ -335,7 +339,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                             {
                                 cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "os", cJSON_GetObjectItemCaseSensitive(temp_register_service, "os")->valuestring);
                             }
-                            cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "create_time", send_time->valueint);
+                            cJSON_AddNumberToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "create_time", send_time->valueint);
                         }
                         // 如果存在元数据，检查是否存在该项，存在就修改，不存在就添加
                         else
@@ -362,7 +366,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                             }
                             else
                             {
-                                cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "create_time", send_time->valueint);
+                                cJSON_AddNumberToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "create_time", send_time->valueint);
                             }
                         }
 
@@ -478,13 +482,13 @@ void resetHeartbeatTime(cJSON *database, cJSON *data)
         cJSON_ArrayForEach(temp_service, cJSON_GetObjectItemCaseSensitive(database, "services"))
         {
             // service相同，遍历instances，比较address，port，server_name
-            if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring, cJSON_GetObjectItemCaseSensitive(temp_heartbeat_services, "service_name")) == 0)
+            if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring, cJSON_GetObjectItemCaseSensitive(temp_heartbeat_services, "service_name")->valuestring) == 0)
             {
                 cJSON *temp_instance;
                 cJSON_ArrayForEach(temp_instance, cJSON_GetObjectItemCaseSensitive(temp_service, "instances"))
                 {
                     // 如果address，port，server_name都相同，更新心跳
-                    if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "server_name")->valuestring, server_name->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring, address->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "port"), port->valueint) == 0)
+                    if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "server_name")->valuestring, server_name->valuestring) == 0 && strcmp(cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring, address->valuestring) == 0 && cJSON_GetObjectItemCaseSensitive(temp_instance, "port")->valueint == port->valueint)
                     {
                         cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(temp_instance, "heartbeat_time"), send_time->valueint);
                     }
@@ -558,23 +562,23 @@ void test()
 }
 
 // 测试函数
-int main()
-{
-    // test();
-    cJSON *database = cJSON_CreateObject();
-    cJSON_AddItemToObject(database, "services", cJSON_CreateArray());
-    processResponse(database, 5);
-    // struct connect_struct conn = config_load(1);
-    // printf("READ_BUFFER_SIZE: %zu\n", conn.READ_BUFFER_SIZE);
+// int main()
+// {
+//     // test();
+//     cJSON *database = cJSON_CreateObject();
+//     cJSON_AddItemToObject(database, "services", cJSON_CreateArray());
+//     processResponse(database, 5);
+//     // struct connect_struct conn = config_load(1);
+//     // printf("READ_BUFFER_SIZE: %zu\n", conn.READ_BUFFER_SIZE);
 
-    // printf("CORE_BUFFER_SIZE: %zu\n", conn.CORE_BUFFER_SIZE);
+//     // printf("CORE_BUFFER_SIZE: %zu\n", conn.CORE_BUFFER_SIZE);
 
-    // printf("READ_TIME_INTERTAL: %zu\n", conn.READ_TIME_INTERTAL);
+//     // printf("READ_TIME_INTERTAL: %zu\n", conn.READ_TIME_INTERTAL);
 
-    // printf("HEARTBEAT_TIME_INTERTAL: %zu\n", conn.HEARTBEAT_TIME_INTERTAL);
+//     // printf("HEARTBEAT_TIME_INTERTAL: %zu\n", conn.HEARTBEAT_TIME_INTERTAL);
 
-    // printf("ADDRESS: %s\n", conn.ADDRESS);
+//     // printf("ADDRESS: %s\n", conn.ADDRESS);
 
-    // printf("PORT: %hu\n", conn.PORT); // 注意：%hu是uint16_t的正确格式说明符
-    return 0;
-}
+//     // printf("PORT: %hu\n", conn.PORT); // 注意：%hu是uint16_t的正确格式说明符
+//     return 0;
+// }

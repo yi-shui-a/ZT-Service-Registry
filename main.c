@@ -4,9 +4,10 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <string.h>
 
 #include "cJSON.h"
-#include "UDPConnector.c"
+#include "UDPConnector.h"
 #include "JsonProcess.h"
 
 void getMainLock(struct config_json_struct config_struct); // 获取设备锁
@@ -43,6 +44,7 @@ int main()
     // 封装配置变量
     struct connect_struct thread_server_config_struct = getConnectStruct(1, config_struct, database);
     struct connect_struct thread_manage_config_struct = getConnectStruct(2, config_struct, database);
+
     // NULL 表示不使用特定的线程属性，使用默认属性。receive_data 是新线程将要执行的函数。
     // &sockfd 是传递给 receive_data 函数的参数，即文件描述符的地址。在 receive_data 函数内部，您可以通过解引用这个指针来访问实际的文件描述符。
 
@@ -51,7 +53,7 @@ int main()
         perror("Failed to create thread_server");
     }
 
-    if (pthread_create(&thread_manage, NULL, UDPconnector, &thread_server_config_struct) != 0)
+    if (pthread_create(&thread_manage, NULL, UDPconnector, &thread_manage_config_struct) != 0)
     {
         perror("Failed to create thread_manage");
     }
@@ -122,17 +124,17 @@ struct connect_struct getConnectStruct(int connection_type, struct config_json_s
     new_struct.HEARTBEAT_TIME_INTERTAL = config_struct.HEARTBEAT_TIME_INTERTAL;
     new_struct.STANDBY_HEARTBEAT_TIME_INTERTAL = config_struct.STANDBY_HEARTBEAT_TIME_INTERTAL;
     new_struct.DATABASE_PERSISTENCE_INTERVAL = config_struct.DATABASE_PERSISTENCE_INTERVAL;
-    strcmp(new_struct.ADDRESS, config_struct.ADDRESS);
+    strcpy(new_struct.ADDRESS, config_struct.ADDRESS);
     // 将database也传入线程
     new_struct.database = database;
     // 判断端口类型
     if (connection_type == 1)
     {
-        strcmp(new_struct.PORT, config_struct.SERVER_PORT);
+        new_struct.PORT=config_struct.SERVER_PORT;
     }
     else if (connection_type == 2)
     {
-        strcmp(new_struct.PORT, config_struct.MANAGE_PORT);
+        new_struct.PORT= config_struct.MANAGE_PORT;
     }
 
     return new_struct;
@@ -160,6 +162,7 @@ int gcdMultiple(int nums[], int size)
     {
         result = gcd(result, nums[i]); // 逐个与后面的数求GCD
     }
+    printf("gcdMultiple:%d\n",result);
     return result;
 }
 
@@ -171,13 +174,16 @@ void monitorDatabase(struct config_json_struct config_struct, cJSON *database)
     time(&start_time);
     size_t database_persistence_interval_count = 0;
     size_t service_instance_time_count = 0;
+    // printf("finished save databse\n");
     while (1)
     {
+        
         sleep(check_interval);
         time_t current_time;
         time(&current_time);
-        if ((current_time - start_time) % config_struct.DATABASE_PERSISTENCE_INTERVAL >= database_persistence_interval_count)
+        if ((current_time - start_time) / config_struct.DATABASE_PERSISTENCE_INTERVAL >= database_persistence_interval_count)
         {
+            printf("finished save databse\n");
             // 保存文件
             saveDatabase(database, config_struct.DATABASE_NAME);
             // 计数器+1
@@ -211,10 +217,6 @@ int saveDatabase(cJSON *database, char *filename)
     // 释放字符串分配的内存
     free(database_str);
     return 1;
-}
-
-void getMainLock(struct config_json_struct config_struct)
-{
 }
 
 // 尝试获取文件锁

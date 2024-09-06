@@ -16,9 +16,6 @@
 // #define ADDRESS "192.168.1.100"
 // #define PORT 8888
 
-#define RESPONSE_MSG "Message received and processed" // 回复消息
-#define RECEIVE_ERROR "Received error message"
-
 // struct connect_struct config_load(int connection_type);
 
 void *receive_server(void *arg);
@@ -59,10 +56,11 @@ void *UDPconnector(void *args)
     // 初始化客户端地址结构
     memset(&register_center_addr, 0, sizeof(register_center_addr));
     register_center_addr.sin_family = AF_INET;
+    
     // register_center_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    register_center_addr.sin_addr.s_addr = htonl(connect_struct.ADDRESS);
+    // 使用inet_addr将字符串转换为网络字节序的IPv4地址
+    register_center_addr.sin_addr.s_addr = inet_addr(connect_struct.ADDRESS);
     register_center_addr.sin_port = htons(connect_struct.PORT);
-
     // 绑定socket
     if (bind(sockfd, (struct sockaddr *)&register_center_addr, sizeof(register_center_addr)) < 0)
     {
@@ -72,7 +70,8 @@ void *UDPconnector(void *args)
     }
 
     printf("Client is ready to receive broadcast messages...\n");
-
+    // printf("%s\n", connect_struct.ADDRESS);
+    printf("Client:  %s : %d\n", connect_struct.ADDRESS, connect_struct.PORT);
     // 创建线程来处理数据接收
     pthread_t recv_thread;
     // NULL 表示不使用特定的线程属性，使用默认属性。receive 是新线程将要执行的函数。
@@ -139,7 +138,7 @@ void *receive_server(void *arg)
             processHeartbeat(database, data_buffer);
             break;
         default:
-            printf(RECEIVE_ERROR);
+            printf("Received error message");
             break;
         }
 
@@ -165,12 +164,15 @@ char *processRegisterMessage(cJSON *database, cJSON *data_buffer)
 {
     return addServiceInstanceRegister(database, data_buffer);
 }
-char *processMetaRegisterMessage(cJSON *database, cJSON *data_buffer){
-    return addServiceInstanceMetadata(database,data_buffer);
+char *processMetaRegisterMessage(cJSON *database, cJSON *data_buffer)
+{
+    return addServiceInstanceMetadata(database, data_buffer);
 }
-char *processQuery(cJSON *database, cJSON *data_buffer){
-    return query(database,data_buffer);
+char *processQuery(cJSON *database, cJSON *data_buffer)
+{
+    return query(database, data_buffer);
 }
-void processHeartbeat(cJSON *database, cJSON *data_buffer){\
-    resetHeartbeatTime(database,data_buffer);
+void processHeartbeat(cJSON *database, cJSON *data_buffer)
+{
+    resetHeartbeatTime(database, data_buffer);
 }

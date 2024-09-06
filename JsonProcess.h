@@ -1,3 +1,6 @@
+#ifndef JSONPROCESS_H
+#define JSONPROCESS_H
+
 #include <stdio.h>
 #include "cJSON.h"
 
@@ -30,3 +33,6 @@ void updateServiceInstanceStatus(cJSON * database,time_t current_time,time_t int
 
 // 获取一个数字的位数
 int getDigit(int i);
+
+
+#endif

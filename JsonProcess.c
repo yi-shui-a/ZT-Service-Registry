@@ -200,7 +200,7 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
                         cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(temp_instance, "heartbeat_time"), send_time->valueint);
                         cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(temp_instance, "role"), cJSON_GetObjectItemCaseSensitive(temp_register_service, "role")->valueint);
                         // 修改完，可以退出循环
-                        return;
+                        break;
                     }
                 }
 
@@ -231,11 +231,11 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
                     cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(temp_service, "instances"), new_instance);
 
                     // 添加实例完毕，开始添加下一个实例
-                    return;
+                    break;
                 }
                 else
                 {
-                    return;
+                    break;
                 }
             }
         }
@@ -382,7 +382,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                         }
 
                         // 修改完，可以退出循环
-                        return;
+                        break;
                     }
                 }
 
@@ -416,11 +416,11 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                     cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(temp_service, "instances"), new_instance);
 
                     // 添加实例完毕，开始添加下一个实例
-                    return;
+                    break;
                 }
                 else
                 {
-                    return;
+                    break;
                 }
             }
         }
@@ -505,14 +505,13 @@ char *query(cJSON *database, cJSON *req_data)
                 cJSON *temp_res_instance = cJSON_CreateObject();
                 cJSON_AddStringToObject(temp_res_instance, "address", cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring);
                 cJSON_AddNumberToObject(temp_res_instance, "port", cJSON_GetObjectItemCaseSensitive(temp_instance, "port")->valueint);
-                cJSON_AddStringToObject(temp_res_instance, "serverName", cJSON_GetObjectItemCaseSensitive(temp_instance, "serverName")->valuestring);
+                cJSON_AddStringToObject(temp_res_instance, "server_name", cJSON_GetObjectItemCaseSensitive(temp_instance, "server_name")->valuestring);
                 cJSON_AddNumberToObject(temp_res_instance, "role", cJSON_GetObjectItemCaseSensitive(temp_instance, "role")->valueint);
                 // 将temp_res_instance添加到result_json中
-                cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(temp_service, "instances"), temp_res_instance);
+                cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(result_json, "instance_list"), temp_res_instance);
             }
             // 修改service_num
             cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(result_json, "service_num"), cJSON_GetArraySize(cJSON_GetObjectItemCaseSensitive(result_json, "instance_list")));
-            return;
         }
     }
 
@@ -552,7 +551,7 @@ void resetHeartbeatTime(cJSON *database, cJSON *data)
                 }
 
                 // 更新完后return，继续遍历services_list
-                return;
+                break;
             }
         }
     }
@@ -579,7 +578,10 @@ char *processResponse(cJSON *response, uint8_t type)
     i -= 1;
     // cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(response, "header"), "message_length")->valuedouble = i;
     cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(response, "header"), "message_length"), i);
-    // printf("%s", cJSON_Print(response));
+    free(reponse_str);
+    reponse_str = cJSON_Print(response);
+    printf("%s", reponse_str);
+
     return reponse_str;
 }
 

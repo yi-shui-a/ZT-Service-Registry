@@ -17,12 +17,6 @@
 				}]
 		}, {
 			"service_name":	"OrderService",
-			"metadata":	{
-				"version":	"v1.1.0",
-				"decription":	"asdasfadf",
-				"developer":	"zhangsan",
-				"build_time":	4356456432
-			},
 			"instances":	[{
 					"instance_id":	"OrderService-1",
 					"server_name":	"register",

@@ -114,7 +114,7 @@ cJSON *initialDatabase(char *filepath)
     {
         cJSON *database = cJSON_CreateObject();
         cJSON_AddArrayToObject(database, "services");
-        printf("database loaded!!!");
+        printf("database loaded!!!\n");
         // 返回文件内容
         return database;
     }
@@ -124,7 +124,7 @@ cJSON *initialDatabase(char *filepath)
         cJSON_AddArrayToObject(database, "services");
     }
 
-    printf("database loaded!!!");
+    printf("database loaded!!!\n");
 
     // 返回文件内容
     return database;

@@ -102,7 +102,6 @@ void *UDPconnector(void *args)
         printf("received_len: %ld\n", received_len);
         printf("Received message:\n%s\n", buffer);
 
-
         // data_buffer = cJSON_Parse("{\"years\":22}");
         pthread_mutex_lock(&data_buffer_lock);
         cJSON *data_buffer = cJSON_Parse(buffer);
@@ -123,16 +122,19 @@ void *UDPconnector(void *args)
         switch (getReceiveType(data_buffer))
         {
         case 1:
+            printf("mission: 1\n");
             strcpy(response_message, processRegisterMessage(database, data_buffer));
             break;
         case 3:
-            printf("mission: 3");
+            printf("mission: 3\n");
             strcpy(response_message, processMetaRegisterMessage(database, data_buffer));
             break;
         case 5:
+            printf("mission: 5\n");
             strcpy(response_message, processQuery(database, data_buffer));
             break;
         case 7:
+            printf("mission: 7\n");
             processHeartbeat(database, data_buffer);
             break;
         default:
@@ -151,7 +153,13 @@ void *UDPconnector(void *args)
         }
         else
         {
+            char temp_addr[20] = {0};
+            struct in_addr addrptr = sender_addr.sin_addr;
+            inet_ntop(AF_INET, &addrptr, temp_addr, sizeof temp_addr);
             printf("Response sent to sender\n");
+            printf("IP: %s\n", temp_addr);
+            printf("PROT: %d\n", ntohs(sender_addr.sin_port));
+            printf("response_message：\n%s\n",response_message);
         }
     }
 
@@ -159,93 +167,100 @@ void *UDPconnector(void *args)
     close(sockfd);
 }
 
-void *receive_server(void *arg)
-{
-    struct receive_data_struct config_arg = *(struct receive_data_struct *)arg;
-    cJSON *database = config_arg.connect_data.database;
+// void *receive_server(void *arg)
+// {
+//     struct receive_data_struct config_arg = *(struct receive_data_struct *)arg;
+//     cJSON *database = config_arg.connect_data.database;
 
-    // 参数为sockfd，套接字描述符
-    int sockfd = config_arg.sockfd;
-    // char buffer[1024];
-    char *buffer = (char *)malloc(config_arg.connect_data.READ_BUFFER_SIZE); // 动态分配内存
-    struct sockaddr_in sender_addr;
-    socklen_t addr_len = sizeof(sender_addr);
-    ssize_t received_len;
-    // cJSON *data_buffer = NULL;
+//     // 参数为sockfd，套接字描述符
+//     int sockfd = config_arg.sockfd;
+//     // char buffer[1024];
+//     char *buffer = (char *)malloc(config_arg.connect_data.READ_BUFFER_SIZE); // 动态分配内存
+//     struct sockaddr_in sender_addr;
+//     socklen_t addr_len = sizeof(sender_addr);
+//     ssize_t received_len;
+//     // cJSON *data_buffer = NULL;
 
-    while (1)
-    {
-        // printf("111\n");
-        // 清空 buffer，避免残留数据影响
-        memset(buffer, 0, config_arg.connect_data.READ_BUFFER_SIZE);
-        // 阻塞接收数据
-        received_len = recvfrom(sockfd, buffer, config_arg.connect_data.READ_BUFFER_SIZE, 0, (struct sockaddr *)&sender_addr, &addr_len);
-        if (received_len < 0)
-        {
-            perror("Failed to receive message");
-            continue;
-        }
+//     while (1)
+//     {
+//         // printf("111\n");
+//         // 清空 buffer，避免残留数据影响
+//         memset(buffer, 0, config_arg.connect_data.READ_BUFFER_SIZE);
+//         // 阻塞接收数据
+//         received_len = recvfrom(sockfd, buffer, config_arg.connect_data.READ_BUFFER_SIZE, 0, (struct sockaddr *)&sender_addr, &addr_len);
+//         if (received_len < 0)
+//         {
+//             perror("Failed to receive message");
+//             continue;
+//         }
 
-        buffer[received_len] = '\0'; // 确保字符串以NULL结尾
-        // char temp_receive_str[received_len+1];
-        // strcpy(temp_receive_str,buffer);
-        // temp_receive_str[received_len] = '\0';
+//         buffer[received_len] = '\0'; // 确保字符串以NULL结尾
+//         // char temp_receive_str[received_len+1];
+//         // strcpy(temp_receive_str,buffer);
+//         // temp_receive_str[received_len] = '\0';
 
-        printf("received_len: %ld\n", received_len);
-        printf("Received message:\n%s\n", buffer);
-        // printf("%c\n", buffer[received_len]);
-        // printf("1111\n");
+//         printf("received_len: %ld\n", received_len);
+//         printf("Received message:\n%s\n", buffer);
+//         // printf("%c\n", buffer[received_len]);
+//         // printf("1111\n");
 
-        // data_buffer = cJSON_Parse("{\"years\":22}");
+//         // data_buffer = cJSON_Parse("{\"years\":22}");
 
-        cJSON *data_buffer = cJSON_Parse(buffer);
-        // printf("%s\n",cJSON_Print(cJSON_Parse(buffer)));
-        printf("11`````````11");
-        if (data_buffer == NULL)
-        {
-            printf("parse fail.\n");
-            continue;
-            // return;
-        }
-        // 处理数据
-        char response_message[20 * 1024];
-        switch (getReceiveType(data_buffer))
-        {
-        case 1:
-            strcpy(response_message, processRegisterMessage(database, data_buffer));
-            break;
-        case 3:
-            printf("mission: 3");
-            strcpy(response_message, processMetaRegisterMessage(database, data_buffer));
-            break;
-        case 5:
-            strcpy(response_message, processQuery(database, data_buffer));
-            break;
-        case 7:
-            processHeartbeat(database, data_buffer);
-            break;
-        default:
-            printf("Received error message");
-            break;
-        }
+//         cJSON *data_buffer = cJSON_Parse(buffer);
+//         // printf("%s\n",cJSON_Print(cJSON_Parse(buffer)));
+//         if (data_buffer == NULL)
+//         {
+//             printf("parse fail.\n");
+//             continue;
+//             // return;
+//         }
+//         // 处理数据
+//         char response_message[20 * 1024];
+//         switch (getReceiveType(data_buffer))
+//         {
+//         case 1:
+//         printf("mission: 1\n");
+//             strcpy(response_message, processRegisterMessage(database, data_buffer));
+//             break;
+//         case 3:
+//             printf("mission: 3\n");
+//             strcpy(response_message, processMetaRegisterMessage(database, data_buffer));
+//             break;
+//         case 5:
+//         printf("mission: 5\n");
+//             strcpy(response_message, processQuery(database, data_buffer));
+//             break;
+//         case 7:
+//         printf("mission: 7\n");
+//             processHeartbeat(database, data_buffer);
+//             break;
+//         default:
+//             printf("Received error message");
+//             break;
+//         }
 
-        // 释放消息
-        cJSON_Delete(data_buffer);
-        // free(buffer);
+//         // 释放消息
+//         cJSON_Delete(data_buffer);
+//         // free(buffer);
 
-        // 生成回复消息
-        if (sendto(sockfd, response_message, strlen(response_message), 0, (struct sockaddr *)&sender_addr, addr_len) < 0)
-        {
-            perror("Failed to send response");
-        }
-        else
-        {
-            printf("Response sent to sender\n");
-        }
-    }
+//         // 生成回复消息
+//         if (sendto(sockfd, response_message, strlen(response_message), 0, (struct sockaddr *)&sender_addr, addr_len) < 0)
+//         {
+//             perror("Failed to send response");
+//         }
+//         else
+//         {
+//             char temp_addr[20]={0};
+//             struct in_addr addrptr = sender_addr.sin_addr;
+//             inet_ntop(AF_INET, &addrptr, temp_addr, sizeof temp_addr);
+//             printf("Response sent to sender\n");
+//             printf("IP: %s\n",temp_addr);
+//             printf("PROT: %d\n",ntohs(sender_addr.sin_port));
+//         }
+//     }
 
-    return NULL;
-}
+//     return NULL;
+// }
 
 char *processRegisterMessage(cJSON *database, cJSON *data_buffer)
 {

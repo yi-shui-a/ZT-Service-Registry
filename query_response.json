@@ -12,13 +12,13 @@
         {
             "address": "127.0.0.1",
             "port": 6666,
-            "serverName": "XXX",
+            "server_name": "XXX",
             "role": 1
         },
         {
             "address": "127.0.0.1",
             "port": 6666,
-            "serverName": "XXX",
+            "server_name": "XXX",
             "role": 1
         }
     ]

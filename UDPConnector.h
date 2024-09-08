@@ -12,6 +12,7 @@
 #include <sys/ioctl.h>
 #include "DataStruct.h"
 #include "JsonProcess.h"
+#include "cJSON.h"
 
 
 // 处理服务端和客户端报文的函数

@@ -7,7 +7,7 @@
 #include <arpa/inet.h>  
   
 #define BUFFER_SIZE 1024 *8 
-#define PORT 12345  
+#define PORT 8888
 #define BROADCAST_ADDR "255.255.255.255"  
 struct sockaddr_in broadcastAddr;  
   
@@ -65,7 +65,7 @@ void broadcast_file(int sock, const char *filename, const char *broadcast_ip, in
     ssize_t numRead;  
   
     while ((numRead = fread(buffer, 1, BUFFER_SIZE, file)) > 0) {  
-        printf("%s",buffer);
+        printf("%s\n",buffer);
         if (sendto(sock, buffer, numRead, 0,  
                    (struct sockaddr *)&broadcastAddr, sizeof(broadcastAddr)) != numRead) {  
             perror("sendto() sent a different number of bytes than expected");  

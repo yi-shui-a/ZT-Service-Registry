@@ -44,49 +44,59 @@ struct config_json_struct config_load(char *filepath)
         return;
     }
 
+    // 打印结果
+    printf("global config loading...\n");
+
     // 访问JSON数据
     // 给结构体赋值并准备返回
     struct config_json_struct result_struct;
     cJSON *READ_BUFFER_SIZE = cJSON_GetObjectItemCaseSensitive(json, "READ_BUFFER_SIZE");
     if (cJSON_IsNumber(READ_BUFFER_SIZE))
     {
-        result_struct.READ_BUFFER_SIZE = READ_BUFFER_SIZE->valueint;
+        result_struct.READ_BUFFER_SIZE = READ_BUFFER_SIZE->valueint * 1024;
+        printf("READ_BUFFER_SIZE: %ld\n", result_struct.READ_BUFFER_SIZE);
     }
 
     cJSON *CORE_BUFFER_SIZE = cJSON_GetObjectItemCaseSensitive(json, "CORE_BUFFER_SIZE");
     if (cJSON_IsNumber(CORE_BUFFER_SIZE))
     {
-        result_struct.CORE_BUFFER_SIZE = CORE_BUFFER_SIZE->valueint;
+        result_struct.CORE_BUFFER_SIZE = CORE_BUFFER_SIZE->valueint * 1024;
+        printf("CORE_BUFFER_SIZE: %ld\n", result_struct.CORE_BUFFER_SIZE);
     }
 
     cJSON *READ_TIME_INTERTAL = cJSON_GetObjectItemCaseSensitive(json, "READ_TIME_INTERTAL");
     if (cJSON_IsNumber(READ_TIME_INTERTAL))
     {
         result_struct.READ_TIME_INTERTAL = READ_TIME_INTERTAL->valueint;
+        printf("READ_TIME_INTERTAL: %ld\n", result_struct.READ_TIME_INTERTAL);
     }
 
     cJSON *HEARTBEAT_TIME_INTERTAL = cJSON_GetObjectItemCaseSensitive(json, "HEARTBEAT_TIME_INTERTAL");
     if (cJSON_IsNumber(HEARTBEAT_TIME_INTERTAL))
     {
         result_struct.HEARTBEAT_TIME_INTERTAL = HEARTBEAT_TIME_INTERTAL->valueint;
+        printf("HEARTBEAT_TIME_INTERTAL: %ld\n", result_struct.HEARTBEAT_TIME_INTERTAL);
     }
 
     cJSON *STANDBY_HEARTBEAT_TIME_INTERTAL = cJSON_GetObjectItemCaseSensitive(json, "STANDBY_HEARTBEAT_TIME_INTERTAL");
     if (cJSON_IsNumber(STANDBY_HEARTBEAT_TIME_INTERTAL))
     {
         result_struct.STANDBY_HEARTBEAT_TIME_INTERTAL = STANDBY_HEARTBEAT_TIME_INTERTAL->valueint;
+        printf("STANDBY_HEARTBEAT_TIME_INTERTAL: %ld\n", result_struct.STANDBY_HEARTBEAT_TIME_INTERTAL);
     }
 
     cJSON *DATABASE_PERSISTENCE_INTERVAL = cJSON_GetObjectItemCaseSensitive(json, "DATABASE_PERSISTENCE_INTERVAL");
     if (cJSON_IsNumber(DATABASE_PERSISTENCE_INTERVAL))
     {
         result_struct.DATABASE_PERSISTENCE_INTERVAL = DATABASE_PERSISTENCE_INTERVAL->valueint;
+        printf("DATABASE_PERSISTENCE_INTERVAL: %ld\n", result_struct.DATABASE_PERSISTENCE_INTERVAL);
     }
 
     cJSON *SERVICE_INSTANCE_TIMEOUT = cJSON_GetObjectItemCaseSensitive(json, "SERVICE_INSTANCE_TIMEOUT");
     if (cJSON_IsNumber(SERVICE_INSTANCE_TIMEOUT))
     {
         result_struct.SERVICE_INSTANCE_TIMEOUT = SERVICE_INSTANCE_TIMEOUT->valueint;
+        printf("SERVICE_INSTANCE_TIMEOUT: %ld\n", result_struct.SERVICE_INSTANCE_TIMEOUT);
     }
 
     cJSON *ADDRESS = cJSON_GetObjectItemCaseSensitive(json, "ADDRESS");
@@ -95,7 +105,7 @@ struct config_json_struct config_load(char *filepath)
     {
 
         strcpy(result_struct.ADDRESS, ADDRESS->valuestring);
-        // printf("%s", result_struct.ADDRESS);
+        printf("ADDRESS: %s\n", result_struct.ADDRESS);
         // printf("%d",strlen(ADDRESS->valuestring));
         // strcat(result_struct.ADDRESS, '\0');
     }
@@ -128,7 +138,6 @@ struct config_json_struct config_load(char *filepath)
     // 清理
     cJSON_Delete(json);
     free(data);
-
     // 返回结果
     return result_struct;
 }
@@ -200,7 +209,7 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
                 {
                     cJSON *new_instance;
                     // 添加id
-                    char temp_id[50];
+                    char temp_id[50] = {0};
                     strcat(temp_id, cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring);
                     strcat(temp_id, "-");
                     int temp_int = cJSON_GetArraySize(cJSON_GetObjectItemCaseSensitive(temp_service, "instances")) + 1;
@@ -211,7 +220,7 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
                     // 添加服务器名等
                     cJSON_AddStringToObject(new_instance, "server_name", server_name->valuestring);
                     cJSON_AddStringToObject(new_instance, "address", address->valuestring);
-                    cJSON_AddStringToObject(new_instance, "port", port->valuestring);
+                    cJSON_AddNumberToObject(new_instance, "port", port->valueint);
                     cJSON_AddNumberToObject(new_instance, "heartbeat_time", send_time->valueint);
                     cJSON_AddStringToObject(new_instance, "status", "UP");
                     cJSON_AddNumberToObject(new_instance, "role", cJSON_GetObjectItemCaseSensitive(temp_register_service, "role")->valueint);
@@ -241,7 +250,7 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
             // 创建instance
             cJSON *new_instance;
             // 添加id
-            char temp_id[50];
+            char temp_id[50] = {0};
             strcat(temp_id, cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring);
             strcat(temp_id, "-");
             int temp_int = cJSON_GetArraySize(cJSON_GetObjectItemCaseSensitive(temp_service, "instances")) + 1;
@@ -252,7 +261,7 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
             // 添加服务器名等
             cJSON_AddStringToObject(new_instance, "server_name", server_name->valuestring);
             cJSON_AddStringToObject(new_instance, "address", address->valuestring);
-            cJSON_AddStringToObject(new_instance, "port", port->valuestring);
+            cJSON_AddNumberToObject(new_instance, "port", port->valueint);
             cJSON_AddNumberToObject(new_instance, "heartbeat_time", send_time->valueint);
             cJSON_AddStringToObject(new_instance, "status", "UP");
             cJSON_AddNumberToObject(new_instance, "role", cJSON_GetObjectItemCaseSensitive(temp_register_service, "role")->valueint);
@@ -305,8 +314,9 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                 }
                 // 不存在就直接把新的添加上
                 cJSON *temp_metadata_json = cJSON_Duplicate(cJSON_GetObjectItemCaseSensitive(temp_register_service, "metadata"), 1); // 第二个参数为1时，会复制字符串内容
-                cJSON_AddItemToObject(temp_service, "metadata", temp_metadata_json);
-
+                // char* temp_metedata_str = cJSON_Print(cJSON_GetObjectItemCaseSensitive(temp_register_service, "metadata"));
+                // cJSON_AddItemToObject(temp_service, "metadata", );
+                // free(temp_metedata_str);
                 // 如果没有实例列表，创建实例列表
                 if (cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(temp_service, "instances")))
                 {
@@ -317,6 +327,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                 cJSON *temp_instance = NULL;
                 cJSON_ArrayForEach(temp_instance, cJSON_GetObjectItemCaseSensitive(temp_service, "instances"))
                 {
+                    //
                     // 通过服务器名、地址、端口判断是否是同一个实例
                     // 如果存在该实例，先修改状态、心跳、主备，在检查是否存在元数据
                     // 如果存在该实例，更新所有状态
@@ -380,7 +391,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                 {
                     cJSON *new_instance;
                     // 添加id
-                    char temp_id[50];
+                    char temp_id[50] = {0};
                     strcat(temp_id, cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring);
                     strcat(temp_id, "-");
                     int temp_int = cJSON_GetArraySize(cJSON_GetObjectItemCaseSensitive(temp_service, "instances")) + 1;
@@ -391,15 +402,15 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                     // 添加服务器名等
                     cJSON_AddStringToObject(new_instance, "server_name", server_name->valuestring);
                     cJSON_AddStringToObject(new_instance, "address", address->valuestring);
-                    cJSON_AddStringToObject(new_instance, "port", port->valuestring);
+                    cJSON_AddNumberToObject(new_instance, "port", port->valueint);
                     cJSON_AddNumberToObject(new_instance, "heartbeat_time", send_time->valueint);
                     cJSON_AddStringToObject(new_instance, "status", "STARTING");
                     cJSON_AddNumberToObject(new_instance, "role", 0);
                     // 添加元数据
                     cJSON_AddItemToObject(new_instance, "metadata", cJSON_CreateObject());
                     cJSON_AddNumberToObject(cJSON_GetObjectItemCaseSensitive(new_instance, "metadata"), "create_time", send_time->valueint);
-                    cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "card", cJSON_GetObjectItemCaseSensitive(temp_register_service, "card")->valuestring);
-                    cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "os", cJSON_GetObjectItemCaseSensitive(temp_register_service, "os")->valuestring);
+                    cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(new_instance, "metadata"), "card", cJSON_GetObjectItemCaseSensitive(temp_register_service, "card")->valuestring);
+                    cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(new_instance, "metadata"), "os", cJSON_GetObjectItemCaseSensitive(temp_register_service, "os")->valuestring);
 
                     // 将新实例添加到instances数组里
                     cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(temp_service, "instances"), new_instance);
@@ -412,6 +423,52 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                     return;
                 }
             }
+        }
+        // 如果不存在服务，创建服务，创建实例
+        if (temp_service == NULL)
+        {
+            temp_service = cJSON_CreateObject();
+            cJSON_AddStringToObject(temp_service, "service_name", cJSON_GetObjectItemCaseSensitive(temp_register_service, "service_name")->valuestring);
+            cJSON_AddItemToObject(temp_service, "metadata", cJSON_Duplicate(cJSON_GetObjectItemCaseSensitive(temp_register_service, "metadata"), 1));
+            // 创建实例列表
+            cJSON_AddItemToObject(temp_service, "instances", cJSON_CreateArray());
+            // 创建实例
+            cJSON *new_instance = cJSON_CreateObject();
+            // 添加id
+            char temp_id[50] = {0};
+            strcat(temp_id, cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring);
+            strcat(temp_id, "-");
+            int temp_int = cJSON_GetArraySize(cJSON_GetObjectItemCaseSensitive(temp_service, "instances")) + 1;
+            char temp_str[10];
+            snprintf(temp_str, sizeof(temp_str), "%d", temp_int);
+            strcat(temp_id, temp_str);
+
+            // printf("\n%ld\n%s\n\n",strlen(temp_id),temp_id);
+            // temp_id[strlen(temp_id)]=0;
+            cJSON_AddStringToObject(new_instance, "instance_id", temp_id);
+            // 添加服务器名等
+            cJSON_AddStringToObject(new_instance, "server_name", server_name->valuestring);
+            cJSON_AddStringToObject(new_instance, "address", address->valuestring);
+            cJSON_AddNumberToObject(new_instance, "port", port->valueint);
+            cJSON_AddNumberToObject(new_instance, "heartbeat_time", send_time->valueint);
+            cJSON_AddStringToObject(new_instance, "status", "STARTING");
+            cJSON_AddNumberToObject(new_instance, "role", 0);
+            // 添加元数据
+            cJSON_AddItemToObject(new_instance, "metadata", cJSON_CreateObject());
+            cJSON_AddNumberToObject(cJSON_GetObjectItemCaseSensitive(new_instance, "metadata"), "create_time", send_time->valueint);
+            cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(new_instance, "metadata"), "card", cJSON_GetObjectItemCaseSensitive(temp_register_service, "card")->valuestring);
+            cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(new_instance, "metadata"), "os", cJSON_GetObjectItemCaseSensitive(temp_register_service, "os")->valuestring);
+
+            // 将新实例添加到instances数组里
+            cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(temp_service, "instances"), new_instance);
+            // char * bbb= cJSON_Print(database);
+            // printf("\n\nbbbbbbbbbbb:\n%s\n\n",bbb);
+            // free(bbb);
+            cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(database, "services"), temp_service);
+
+            // char * aaa= cJSON_Print(temp_service);
+            // printf("\n\naaaaaaaaaaaaa:\n%s\n\n",aaa);
+            // free(aaa);
         }
     }
 
@@ -552,6 +609,11 @@ void updateServiceInstanceStatus(cJSON *database, time_t current_time, time_t in
             }
         }
     }
+}
+
+cJSON *parseFromStr(char *buffer)
+{
+    return cJSON_Parse(buffer);
 }
 
 void test()

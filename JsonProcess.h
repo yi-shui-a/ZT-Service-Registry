@@ -35,4 +35,6 @@ void updateServiceInstanceStatus(cJSON * database,time_t current_time,time_t int
 int getDigit(int i);
 
 
+cJSON* parseFromStr(char* buffer);
+
 #endif

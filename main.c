@@ -74,6 +74,7 @@ cJSON *initialDatabase(char *filepath)
     if (file == NULL)
     {
         cJSON *database = cJSON_CreateObject();
+        cJSON_AddArrayToObject(database, "services");
         return database;
     }
     // 查找文件大小
@@ -109,7 +110,21 @@ cJSON *initialDatabase(char *filepath)
     fclose(file);
 
     // 创建一个cJSON变量
+    if (strlen(buffer) < 5)
+    {
+        cJSON *database = cJSON_CreateObject();
+        cJSON_AddArrayToObject(database, "services");
+        printf("database loaded!!!");
+        // 返回文件内容
+        return database;
+    }
     cJSON *database = cJSON_Parse(buffer);
+    if (cJSON_GetObjectItemCaseSensitive(database, "services") == NULL)
+    {
+        cJSON_AddArrayToObject(database, "services");
+    }
+
+    printf("database loaded!!!");
 
     // 返回文件内容
     return database;
@@ -130,11 +145,11 @@ struct connect_struct getConnectStruct(int connection_type, struct config_json_s
     // 判断端口类型
     if (connection_type == 1)
     {
-        new_struct.PORT=config_struct.SERVER_PORT;
+        new_struct.PORT = config_struct.SERVER_PORT;
     }
     else if (connection_type == 2)
     {
-        new_struct.PORT= config_struct.MANAGE_PORT;
+        new_struct.PORT = config_struct.MANAGE_PORT;
     }
 
     return new_struct;
@@ -162,7 +177,7 @@ int gcdMultiple(int nums[], int size)
     {
         result = gcd(result, nums[i]); // 逐个与后面的数求GCD
     }
-    printf("gcdMultiple:%d\n",result);
+    printf("gcdMultiple:%d\n", result);
     return result;
 }
 
@@ -177,7 +192,7 @@ void monitorDatabase(struct config_json_struct config_struct, cJSON *database)
     // printf("finished save databse\n");
     while (1)
     {
-        
+
         sleep(check_interval);
         time_t current_time;
         time(&current_time);
@@ -203,13 +218,17 @@ void monitorDatabase(struct config_json_struct config_struct, cJSON *database)
 int saveDatabase(cJSON *database, char *filename)
 {
     char *database_str = cJSON_Print(database);
+    printf("save database:\n%s\n", database_str);
 
     // 将字符串写入文件
     FILE *file = fopen(filename, "w");
-    if (file == NULL)
+    if (database_str == NULL)
     {
-        perror("Error opening file");
-        return;
+        perror("database is null!!!\n");
+        if (file != NULL)
+            fclose(file);
+
+        return -1; // 或其他错误码
     }
     fprintf(file, "%s", database_str);
     fclose(file);
@@ -280,23 +299,23 @@ void getMainLock(struct config_json_struct config_struct)
         fd = try_lock_file(lockfile);
         if (fd > 0)
         {
-            printf("[INFO] Became PRIMARY.\n");
+            printf("[INFO] %s Became PRIMARY.\n", config_struct.ADDRESS);
             break;
         }
         else if (fd == 0)
         {
-            printf("[INFO] Became BACKUP, monitoring MAIN.\n");
+            printf("[INFO] %s Became BACKUP, monitoring MAIN.\n", config_struct.ADDRESS);
         }
         else
         {
-            printf("[ERROR] Failed to check lock.\n");
+            printf("[ERROR] %s Failed to check lock.\n", config_struct.ADDRESS);
         }
         // 检查主服务器是否存活（超时机制）
         sleep(STANDBY_HEARTBEAT_TIME_INTERTAL);
         fd = try_lock_file(lockfile);
         if (fd > 0)
         {
-            printf("[INFO] PRIMARY server timeout, becoming PRIMARY.\n");
+            printf("[INFO] PRIMARY server timeout, %s becoming PRIMARY.\n", config_struct.ADDRESS);
             break;
         }
     }

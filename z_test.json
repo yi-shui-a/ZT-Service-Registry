@@ -7,7 +7,7 @@
         "check_bit": 4,
         "type": 3
     },
-    "server_name": "register",
+    "serverName": "register",
     "address": "192.168.1.10",
     "port": 50051,
     "services_list": [

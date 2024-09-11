@@ -24,13 +24,17 @@
 4. message_serial_number,报文流水号,uint16_t
 5. check_bit，校验位，uint8_t
 6. type，消息类型，uint8_t
+   1. register, 注册报文, type = 1。
+   2. register_response, 注册回复报文, type = 2。
+   3. matadata, 元数据注册报文, type = 3。
+   4. matadata_response, 元数据注册回复报文, type = 4。
+   5. query, 查询报文, type = 5。
+   6. query_response, 查询回复报文, type = 6。
+   7. heartbeat, 心跳报文, type = 7。
+   8. manage, 管理消息报文, type = 8。
+   9. manage_response, 管理消息回复报文, type = 9。
 
 
-## 注意
-1. 代码写完之后让gpt检查一下有无内存泄漏、异常检查等方面的问题。
-
-## 代码修改注意事项
-1. 创建服务实例时必须同时创建实例中的所有信息（除了metadata）
 
 ## 流程
 1. 加载配置文件，设置全局变量。

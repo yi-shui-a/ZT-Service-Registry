@@ -10,11 +10,17 @@
 					"status":	"DOWN",
 					"role":	1,
 					"metadata":	{
-						"create_time":	1354655676,
 						"card":	"huawei",
-						"os":	"openEuler"
+						"os":	"openEuler",
+						"create_time":	1354655676
 					}
-				}]
+				}],
+			"metadata":	{
+				"version":	"v1.0.0",
+				"decription":	"asdasfadf",
+				"developer":	"zhangsan",
+				"build_time":	4356456432
+			}
 		}, {
 			"service_name":	"OrderService",
 			"instances":	[{
@@ -24,12 +30,18 @@
 					"port":	50051,
 					"heartbeat_time":	1354655676,
 					"status":	"DOWN",
-					"role":	0,
+					"role":	2,
 					"metadata":	{
-						"create_time":	1354655676,
 						"card":	"rk3588",
-						"os":	"huawei"
+						"os":	"huawei",
+						"create_time":	1354655676
 					}
-				}]
+				}],
+			"metadata":	{
+				"version":	"v1.1.0",
+				"decription":	"asdasfadf",
+				"developer":	"zhangsan",
+				"build_time":	4356456432
+			}
 		}]
 }

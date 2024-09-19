@@ -39,10 +39,10 @@ struct connect_struct
     cJSON *database;
 };
 
-struct receive_data_struct
-{
-    struct connect_struct connect_data;
-    int sockfd;
-};
+// struct receive_data_struct
+// {
+//     struct connect_struct connect_data;
+//     int sockfd;
+// };
 
 #endif

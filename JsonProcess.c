@@ -182,7 +182,7 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
             if (strcmp(cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring, cJSON_GetObjectItemCaseSensitive(temp_register_service, "service_name")->valuestring) == 0)
             {
                 // 如果没有实例列表，创建实例列表
-                if (cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(temp_service, "instances")))
+                if (cJSON_GetObjectItemCaseSensitive(temp_service, "instances") == NULL)
                 {
                     cJSON_AddItemToObject(temp_service, "instances", cJSON_CreateArray());
                 }
@@ -246,9 +246,11 @@ char *addServiceInstanceRegister(cJSON *database, cJSON *data)
             // 创建服务和instances
             temp_service = cJSON_CreateObject();
             cJSON_AddStringToObject(temp_service, "service_name", cJSON_GetObjectItemCaseSensitive(temp_register_service, "service_name")->valuestring);
+            // 创建实例列表
             cJSON_AddItemToObject(temp_service, "instances", cJSON_CreateArray());
             // 创建instance
-            cJSON *new_instance;
+            cJSON *new_instance = cJSON_CreateObject();
+            ;
             // 添加id
             char temp_id[50] = {0};
             strcat(temp_id, cJSON_GetObjectItemCaseSensitive(temp_service, "service_name")->valuestring);
@@ -308,17 +310,15 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
             {
                 // 检查服务元数据是否存在
                 // 存在则将以前的删除了，再把新的添加上
-                if (!cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(temp_service, "metadata")))
+                if (cJSON_GetObjectItemCaseSensitive(temp_service, "metadata") != NULL)
                 {
                     cJSON_DeleteItemFromObject(temp_service, "metadata");
                 }
                 // 不存在就直接把新的添加上
                 cJSON *temp_metadata_json = cJSON_Duplicate(cJSON_GetObjectItemCaseSensitive(temp_register_service, "metadata"), 1); // 第二个参数为1时，会复制字符串内容
-                // char* temp_metedata_str = cJSON_Print(cJSON_GetObjectItemCaseSensitive(temp_register_service, "metadata"));
-                // cJSON_AddItemToObject(temp_service, "metadata", );
-                // free(temp_metedata_str);
+                cJSON_AddItemToObject(temp_service, "metadata", temp_metadata_json);
                 // 如果没有实例列表，创建实例列表
-                if (cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(temp_service, "instances")))
+                if (cJSON_GetObjectItemCaseSensitive(temp_service, "instances") == NULL)
                 {
                     cJSON_AddItemToObject(temp_service, "instances", cJSON_CreateArray());
                 }
@@ -327,7 +327,6 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                 cJSON *temp_instance = NULL;
                 cJSON_ArrayForEach(temp_instance, cJSON_GetObjectItemCaseSensitive(temp_service, "instances"))
                 {
-                    //
                     // 通过服务器名、地址、端口判断是否是同一个实例
                     // 如果存在该实例，先修改状态、心跳、主备，在检查是否存在元数据
                     // 如果存在该实例，更新所有状态
@@ -339,11 +338,14 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
 
                         // 检查是否存在元数据
                         // 如果不存在元数据，添加元数据
-                        if (cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata")))
+                        // printf("\n\n%s\n\n", cJSON_Print(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata")));
+                        // printf("\n\n%d\n\n", cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata")));
+                        if (cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata") == NULL)
                         {
                             cJSON_AddItemToObject(temp_instance, "metadata", cJSON_CreateObject());
                             if (cJSON_IsString(cJSON_GetObjectItemCaseSensitive(temp_register_service, "card")))
                             {
+                                // printf("")
                                 cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "card", cJSON_GetObjectItemCaseSensitive(temp_register_service, "card")->valuestring);
                             }
                             if (cJSON_IsString(cJSON_GetObjectItemCaseSensitive(temp_register_service, "os")))
@@ -355,7 +357,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                         // 如果存在元数据，检查是否存在该项，存在就修改，不存在就添加
                         else
                         {
-                            if (!cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "card")))
+                            if (cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "card") != NULL)
                             {
                                 cJSON_SetValuestring(cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "card"), cJSON_GetObjectItemCaseSensitive(temp_register_service, "card")->valuestring);
                             }
@@ -363,7 +365,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                             {
                                 cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "card", cJSON_GetObjectItemCaseSensitive(temp_register_service, "card")->valuestring);
                             }
-                            if (!cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "os")))
+                            if (cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "os") != NULL)
                             {
                                 cJSON_SetValuestring(cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "os"), cJSON_GetObjectItemCaseSensitive(temp_register_service, "os")->valuestring);
                             }
@@ -371,7 +373,7 @@ char *addServiceInstanceMetadata(cJSON *database, cJSON *data)
                             {
                                 cJSON_AddStringToObject(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "os", cJSON_GetObjectItemCaseSensitive(temp_register_service, "os")->valuestring);
                             }
-                            if (!cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "create_time")))
+                            if (cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "create_time") != NULL)
                             {
                                 cJSON_SetIntValue(cJSON_GetObjectItemCaseSensitive(cJSON_GetObjectItemCaseSensitive(temp_instance, "metadata"), "create_time"), send_time->valueint);
                             }

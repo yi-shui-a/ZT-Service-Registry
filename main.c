@@ -12,6 +12,8 @@
 
 void getMainLock(struct config_json_struct config_struct); // 获取设备锁
 cJSON *initialDatabase(char *filepath);
+// 清理文件中的内容
+void clearFile(char *filepath);
 // void initialService(cJSON *database);
 struct connect_struct getConnectStruct(int connection_type, struct config_json_struct config_struct, cJSON *database);
 void monitorDatabase(struct config_json_struct config_struct, cJSON *database);
@@ -28,6 +30,7 @@ int main()
     getMainLock(config_struct);
 
     // 定义一个全局的数据库变量
+    clearFile(config_struct.DATABASE_NAME); // 清除数据库
     cJSON *database = initialDatabase(config_struct.DATABASE_NAME);
 
     /*
@@ -319,4 +322,20 @@ void getMainLock(struct config_json_struct config_struct)
             break;
         }
     }
+}
+
+void clearFile(char *filepath)
+{
+    // 以写入模式打开文件
+    FILE *file = fopen(filepath, "w");
+    if (file == NULL)
+    {
+        perror("can not open file.");
+        return;
+    }
+
+    // 关闭文件，这将自动清空文件内容
+    fclose(file);
+    printf("%s",filepath);
+    printf("The file content has been cleared.\n");
 }

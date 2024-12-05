@@ -502,8 +502,10 @@ char *query(cJSON *database, cJSON *req_data)
         {
             // 遍历服务中所有的instance
             cJSON *temp_instance = NULL;
-            cJSON_ArrayForEach(temp_service, cJSON_GetObjectItemCaseSensitive(temp_service, "instances"))
+            int temp_instance_num = 0;
+            cJSON_ArrayForEach(temp_instance, cJSON_GetObjectItemCaseSensitive(temp_service, "instances"))
             {
+                // printf("Instance");
                 cJSON *temp_res_instance = cJSON_CreateObject();
                 cJSON_AddStringToObject(temp_res_instance, "address", cJSON_GetObjectItemCaseSensitive(temp_instance, "address")->valuestring);
                 cJSON_AddNumberToObject(temp_res_instance, "port", cJSON_GetObjectItemCaseSensitive(temp_instance, "port")->valueint);
@@ -511,13 +513,20 @@ char *query(cJSON *database, cJSON *req_data)
                 cJSON_AddNumberToObject(temp_res_instance, "role", cJSON_GetObjectItemCaseSensitive(temp_instance, "role")->valueint);
                 // 将temp_res_instance添加到result_json中
                 cJSON_AddItemToArray(cJSON_GetObjectItemCaseSensitive(result_json, "instance_list"), temp_res_instance);
+                temp_instance_num++;
+                if (temp_instance_num == service_num)
+                {
+                    break;
+                }
             }
             // 修改service_num
-            cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(result_json, "service_num"), cJSON_GetArraySize(cJSON_GetObjectItemCaseSensitive(result_json, "instance_list")));
+            // cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(result_json, "service_num"), cJSON_GetArraySize(cJSON_GetObjectItemCaseSensitive(result_json, "instance_list")));
+            cJSON_SetNumberValue(cJSON_GetObjectItemCaseSensitive(result_json, "service_num"), temp_instance_num);
         }
     }
 
-    // 没找到服务，不需要操作
+    // 没找到服务，直接返回
+
     // 给result_json添加报头，并转为字符串返回
     return processResponse(result_json, 6);
 }

@@ -9,6 +9,6 @@
     "ADDRESS": "127.0.0.1",
     "SERVER_PORT": 8888,
     "MANAGE_PORT":8889,
-    "DATABASE_NAME":"database_test.json",
-    "LOCKFILE":"standby.json"
+    "DATABASE_NAME":"config/database_test.json",
+    "LOCKFILE":"config/standby.json"
 } 

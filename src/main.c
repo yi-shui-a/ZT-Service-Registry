@@ -23,7 +23,7 @@ int main()
 {
 
     // 加载配置文件，设置全局变量。
-    struct config_json_struct config_struct = config_load("config.json");
+    struct config_json_struct config_struct = config_load("config/config.json");
 
     // 获取设备锁
     // 如果能获取，作为主份持续运行;如果不能获取，作为备份，持续心跳，等待成为主份
